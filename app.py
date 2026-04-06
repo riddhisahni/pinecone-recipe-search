@@ -1,12 +1,20 @@
 import os
-from dotenv import load_dotenv
 import streamlit as st
 from pinecone import Pinecone
 
-load_dotenv()
+try:
+    api_key = st.secrets["PINECONE_API_KEY"]
+    host = st.secrets["PINECONE_HOST"]
+except Exception:
+    api_key = os.getenv("PINECONE_API_KEY")
+    host = os.getenv("PINECONE_HOST")
 
-pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
-index = pc.Index(host=os.environ["PINECONE_HOST"])
+if not api_key or not host:
+    st.error("Missing Pinecone credentials. Set Streamlit secrets or environment variables.")
+    st.stop()
+
+pc = Pinecone(api_key=api_key)
+index = pc.Index(host=host)
 
 st.set_page_config(page_title="Recipe Search", page_icon="🍽️")
 
